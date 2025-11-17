@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax & VAT Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .result-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .result-card h5 {
+            margin-bottom: 10px;
+        }
+    </style>
+</ class="row g-4">
+        <!-- VAT Registered -->
+        <div class="col-md-6">
+            <div class="border p-3 bg-light rounded">
+                <h4 class="text-primary">VAT Registered</h4>
+                <div class="mb-3">
+                    <label for="vatType" class="form-label">Select Type:</label>
+                    <select id="vatType" class="form-select">
+                        <option value="">--Choose--</option>
+                        <option value="goods">Goods</option>
+                        <option value="services">Services</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="vatGross" class="form-label">Enter Gross Amount:</label>
+                    <input type="number" id="vatGross" class="form-control" placeholder="e.g. 1000">
+                </div>
+                <div id="vatResult" class="result-card mt-3 text-primary"></div>
+            </div>
+        </div>
+
+        <!-- Non-VAT Registered -->
+        <div class="col-md-6">
+            <div class="border p-3 bg-light rounded">
+                <h4 class="text-success">Non-VAT Registered</h4>
+                <div class="mb-3">
+                    <label for="nonVatType" class="form-label">Select Type:</label>
+                    <select id="nonVatType" class="form-select">
+                        <option value="">--Choose--</option>
+                        <option value="goods">Goods</option>
+                        <option value="services">Services</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="nonVatGross" class="form-label">Enter Gross Amount:</label>
+                    <input type="number" id="nonVatGross" class="form-control" placeholder="e.g. 1000">
+                </div>
+                <div id="nonVatResult" class="result-card mt-3 text-success"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+
+<script>
+    // Live computation for VAT Registered
+    document.getElementById('vatType').addEventListener('change', computeVAT);
+    document.getElementById('vatGross').addEventListener('input', computeVAT);
+
+    function computeVAT() {
+        let type = document.getElementById('vatType').value;
+        let gross = parseFloat(document.getElementById('vatGross').value);
+        if (!type || isNaN(gross) || gross <= 0) {
+            document.getElementById('vatResult').innerHTML = "Please select type and enter a valid amount.";
+            return;
+        }
+
+        let quotient = gross / 1.12;
+        let fivePercent = quotient * 0.05;
+        let otherPercent = type === 'goods' ? quotient * 0.01 : quotient * 0.02;
+        let sum = fivePercent + otherPercent;
+        let net = gross - sum;
+
+        document.getElementById('vatResult').innerHTML = `
+            <h5>Computation Details</h5>
+            Gross: ₱${gross.toFixed(2)}<br>
+            Quotient (Gross ÷ 1.12): ₱${quotient.toFixed(2)}<br>
+            5%: ₱${fivePercent.toFixed(2)}<br>
+            ${type === 'goods' ? '1%' : '2%'}: ₱${otherPercent.toFixed(2)}<br>
+            Sum of taxes: ₱${sum.toFixed(2)}<br>
+            <strong>Net Amount: ₱${net.toFixed(2)}</strong>
+        `;
+    }
+
+    // Live computation for Non-VAT Registered
+    document.getElementById('nonVatType').addEventListener('change', computeNonVAT);
+    document.getElementById('nonVatGross').addEventListener('input', computeNonVAT);
+
+    function computeNonVAT() {
+        let type = document.getElementById('nonVatType').value;
+        let gross = parseFloat(document.getElementById('nonVatGross').value);
+        if (!type || isNaN(gross) || gross <= 0) {
+            document.getElementById('nonVatResult').innerHTML = "Please select type and enter a valid amount.";
+            return;
+        }
+
+        let threePercent = gross * 0.03;
+        let otherPercent = type === 'goods' ? gross * 0.01 : gross * 0.02;
+        let sum = threePercent + otherPercent;
+        let net = gross - sum;
+
+        document.getElementById('nonVatResult').innerHTML = `
+            <h5>Computation Details</h5>
+            Gross: ₱${gross.toFixed(2)}<br>
+            3%: ₱${threePercent.toFixed(2)}<br>
+            ${type === 'goods' ? '1%' : '2%'}: ₱${otherPercent.toFixed(2)}<br>
+            Sum of taxes: ₱${sum.toFixed(2)}<br>
+            <strong>Net Amount: ₱${net.toFixed(2)}</strong>
+        `;
+    }
+</script>
+</body>
+</html>
